@@ -71,7 +71,8 @@ jobs:
 
       - name: Align APK
         run: |
-          zipalign -f -p 4 \
+          ZIPALIGN="$ANDROID_HOME/build-tools/35.0.0/zipalign"
+          "$ZIPALIGN" -f -p 4 \
             project/vakhta_android_project/app/build/outputs/apk/debug/app-debug.apk \
             "$RUNNER_TEMP/app-aligned.apk"
 
