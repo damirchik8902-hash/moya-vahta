@@ -1,3 +1,4 @@
+
 name: Build My Vakhta APK
 
 on:
@@ -94,6 +95,33 @@ jobs:
             "$RUNNER_TEMP/app-aligned.apk"
 
           "$APKSIGNER" verify "$RUNNER_TEMP/app-release.apk"
+
+      - name: Diagnose APK
+        if: always()
+        shell: bash
+        run: |
+          APK="$RUNNER_TEMP/app-release.apk"
+          TOOLS="$ANDROID_HOME/build-tools/35.0.0"
+
+          if [ ! -f "$APK" ]; then
+            echo "ERROR: APK file was not created."
+            exit 1
+          fi
+
+          echo "===== APK FILE ====="
+          ls -lh "$APK"
+          sha256sum "$APK"
+
+          echo "===== ZIP INTEGRITY ====="
+          unzip -t "$APK"
+
+          echo "===== ANDROID PACKAGE INFO ====="
+          "$TOOLS/aapt" dump badging "$APK" || true
+
+          echo "===== APK SIGNATURE ====="
+          "$TOOLS/apksigner" verify \
+            --verbose --print-certs "$APK"
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
